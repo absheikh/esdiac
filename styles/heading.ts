@@ -20,13 +20,13 @@ export const Heading = styled.h1<HeadingProps>`
   font-weight: 700;
   @media screen and (max-width: 900px) {
     text-align: center !important;
-    font-size: 38px;
+    font-size: 40px;
     margin-bottom: 15px;
     margin-top: 15px;
   }
   @media screen and (max-width: 600px) {
     text-align: center !important;
-    font-size: 20px;
+    font-size: 30px;
     margin-bottom: 10px;
     margin-top: 10px;
   }

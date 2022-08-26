@@ -27,6 +27,26 @@ body{
 
 
 }
+.textDesktop{
+  
+    @media screen and (max-width: 600px) {
+      display: none;
+}
+}
+.textDesktop2{
+  
+    @media screen and (max-width: 900px) {
+      display: none;
+}
+}
+.textMobile{
+    display: none;
+    @media screen and (max-width: 600px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+}
     
  .invalid {
     border-color:#8b0000;

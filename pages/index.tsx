@@ -20,40 +20,57 @@ import { Input } from "../styles/input";
 import { Label } from "../styles/label";
 import { Text } from "../styles/text";
 import { Wrapper } from "../styles/wrapper";
+import { Notification } from "../styles/notification";
+import { useAuth } from "../shared/authContext";
 
 const Home: NextPage = () => {
+  const { isAuthenticated, login, user, logout, isLoading } = useAuth();
   const [phone, setPhone] = React.useState<any>();
   const [password, setPassword] = React.useState<any>();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const login = async () => {
-    setIsLoading(true);
-    await fetch(`${API_URI}/authenticate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({
-        phone,
-        password,
-      }),
-    })
-      .then((res: any) => {
-        if (res.status == "success") {
-          setIsLoading(false);
 
-          console.log(res.data);
-        } else {
-          console.log(res.data.message);
-          setIsLoading(false);
+  const [isNotification, setIsNotification] = React.useState(false);
+  const [NotificationMessage, setNotificationMessage] = React.useState("");
+  let error = false;
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+    //Iteare over the form to check empty fields
+
+    for (let i = 0; i < e.target.length; i++) {
+      if (e.target[i].value === "") {
+        // e.target[i].focus();
+        // add class invalid
+        error = true;
+
+        if (e.target[i].name != "button") {
+          e.target[i].classList.add("invalid");
+
+          return;
         }
-      })
-      .catch((err: any) => {
-        setIsLoading(false);
-
-        console.log(err);
-      });
+        // alert("Please fill all the fields");
+      }
+      error = false;
+    }
+    if (!error) {
+      console.log(phone, password);
+      login({ phone, password });
+    }
   };
+  // iterate all on typing remove invalid class
+  React.useEffect(() => {
+    for (let i = 0; i < document.querySelectorAll("input").length; i++) {
+      document
+        .querySelectorAll("input")
+        [i].addEventListener("keyup", function () {
+          this.classList.remove("invalid");
+        });
+
+      document
+        .querySelectorAll("input")
+        [i].addEventListener("focus", function () {
+          this.classList.remove("invalid");
+        });
+    }
+  }, [error]);
 
   return (
     <>
@@ -74,16 +91,24 @@ const Home: NextPage = () => {
             >
               Esdiac Test Project
             </Heading>
-            <Text size="23px" lineHeight="27.9px" width="290px">
-              If you don’t have an account you can{" "}
-              <Link href="/register">Register here!</Link>
+            <Text
+              size="23px"
+              lineHeight="40px"
+              width=""
+              className="textDesktop2"
+            >
+              Simple Authentication Web Site Created with Next.js, React,
+              Typescript and Postgresql
             </Text>
           </DivImage>
           <FormContainer mt="112px">
-            {/* <Heading mb="36px" size="48px">
+            <Heading mb="36px" size="48px">
               Login
-            </Heading> */}
-            <FormColumn>
+            </Heading>
+            <FormColumn onSubmit={handleLogin}>
+              {isNotification && (
+                <Notification>{NotificationMessage}</Notification>
+              )}
               <FormGroup>
                 <Label>Phone Number</Label>
                 <PhoneInput
@@ -106,12 +131,24 @@ const Home: NextPage = () => {
                   }}
                 />
               </FormGroup>
+
+              <Center>
+                <Button type="submit" name="button">
+                  {isLoading ? "Loading..." : "Login"}
+                </Button>
+              </Center>
             </FormColumn>
-            <Center mt="50px">
-              <Button onClick={login}>
-                {isLoading ? "Loading..." : "Login"}
-              </Button>
-            </Center>
+
+            <Text
+              size="23px"
+              lineHeight="27.9px"
+              className=""
+              mt="16px"
+              align="center"
+            >
+              If you don’t have an account you can{" "}
+              <Link href="/register">Register here!</Link>
+            </Text>
           </FormContainer>
         </Container>
       </Wrapper>

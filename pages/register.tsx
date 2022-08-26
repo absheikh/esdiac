@@ -172,7 +172,7 @@ const Register: NextPage = () => {
                 </FormGroup>
               </FormRows>
               <FormRows>
-                <Empty>
+                <Empty className="textDesktop">
                   {" "}
                   <Text size="23px" lineHeight="27.9px" width="290px">
                     If you have an account you can{" "}
@@ -184,6 +184,13 @@ const Register: NextPage = () => {
                     Register
                   </Button>
                 </FormGroup>
+                <Empty className="textMobile">
+                  {" "}
+                  <Text size="23px" lineHeight="27.9px" width="290px">
+                    If you have an account you can{" "}
+                    <Link href="/">Login here!</Link>
+                  </Text>
+                </Empty>
               </FormRows>
             </FormColumn>
           </FormContainer>

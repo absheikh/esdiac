@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import axios from "axios";
 const AuthContext = createContext();
-
+import { API_URL } from "../const";
 function AuthProvider({ children }) {
   const [user, setUser] = useState({
     error: "you are logged out, and there is no user object, and no token",
@@ -18,20 +19,41 @@ function AuthProvider({ children }) {
     setIsLoading(false);
   }, []);
 
-  function loginWithToken() {
-    localStorage.setItem("token", "true");
-    setIsAuthenticated(true);
-    setUser({
-      name: "hello",
-      msg: "Logged in because token in localStorage",
-    });
-  }
-  function login() {
-    setIsAuthenticated(true);
-    setUser({
-      name: "hello",
-      msg: "Logged in by clicking login button, you still have no token",
-    });
+  function login(data) {
+    setIsLoading(true);
+    const { email, password } = data;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    };
+    axios
+      .request({
+        method: "post",
+        url: `${API_URL}/authenticate`,
+        data: {
+          email,
+          password,
+        },
+        config,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          const { token } = res.data;
+          localStorage.setItem("token", token);
+          setUser(res.data);
+          setIsAuthenticated(true);
+          setIsLoading(false);
+        } else {
+          setIsAuthenticated(false);
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log("err: ", err);
+        setIsLoading(false);
+      });
   }
 
   function logout() {
@@ -49,7 +71,6 @@ function AuthProvider({ children }) {
         user,
         login,
         logout,
-        loginWithToken,
         isLoading,
       }}
     >

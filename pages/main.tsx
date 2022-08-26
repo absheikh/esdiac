@@ -49,11 +49,14 @@ const Main: NextPage = () => {
           <Heading mb="50px">Main Page</Heading>
           <Text size="28px" lineHeight="36px">
             {" "}
-            Hello my first name is my last name is my email is
+            Hello my first name is {user.firsname} my last name {user.lastname}{" "}
+            is my email is {user.email}
           </Text>
 
           <Text>
-            <Link href="/logout">Logout</Link>
+            <Link href="#" onClick={logout}>
+              Logout
+            </Link>
           </Text>
         </MainContainer>
       </Wrapper>
