@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -21,8 +21,26 @@ import { Label } from "../styles/label";
 import { Text } from "../styles/text";
 import { Wrapper } from "../styles/wrapper";
 import { MainContainer } from "../styles/mainContainer";
+
+import Router from "next/router";
+const useUser = () => {
+  const [user, setUser] = React.useState(null);
+  React.useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      setUser(JSON.parse(user));
+    }
+  }, []);
+  return user;
+};
+
 const Main: NextPage = () => {
-  const [value, setValue] = React.useState<any>();
+  const user = useUser();
+  useEffect(() => {
+    if (!user) {
+      Router.push("/");
+    }
+  });
 
   return (
     <>
@@ -33,7 +51,7 @@ const Main: NextPage = () => {
       </Head>
       <Wrapper>
         <MainContainer>
-          <Heading mb="50px"> Main Page</Heading>
+          <Heading mb="50px">Main Page</Heading>
           <Text size="28px" lineHeight="36px">
             {" "}
             Hello my first name is my last name is my email is

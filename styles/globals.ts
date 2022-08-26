@@ -28,7 +28,12 @@ body{
 
 }
     
- 
+ .invalid {
+    border-color:#8b0000;
+    color: #8b0000 !important;
+    background-color: #f2dede !important;
+}
+    
 
 .scroll{
 box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);

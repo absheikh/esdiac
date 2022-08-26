@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, SyntheticEvent } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -11,8 +11,7 @@ import { Div } from "../styles/div";
 import { FormContainer } from "../styles/formContainer";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { useContext } from "react";
-
+import { API_URI } from "../const";
 import { FormGroup } from "../styles/formGroup";
 import { FormColumn } from "../styles/formRow";
 import { Heading } from "../styles/heading";
@@ -21,15 +20,38 @@ import { Input } from "../styles/input";
 import { Label } from "../styles/label";
 import { Text } from "../styles/text";
 import { Wrapper } from "../styles/wrapper";
-import { AuthContext } from "../stores/authContext";
 
 const Home: NextPage = () => {
   const [phone, setPhone] = React.useState<any>();
   const [password, setPassword] = React.useState<any>();
-  const { signIn, register } = React.useContext(AuthContext);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const login = async () => {
+    setIsLoading(true);
+    await fetch(`${API_URI}/authenticate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phone,
+        password,
+      }),
+    })
+      .then((res: any) => {
+        if (res.status == "success") {
+          setIsLoading(false);
 
-  const handleLogin = () => {
-    signIn({ phone, password });
+          console.log(res.data);
+        } else {
+          console.log(res.data.message);
+          setIsLoading(false);
+        }
+      })
+      .catch((err: any) => {
+        setIsLoading(false);
+
+        console.log(err);
+      });
   };
 
   return (
@@ -85,7 +107,9 @@ const Home: NextPage = () => {
               </FormGroup>
             </FormColumn>
             <Center mt="50px">
-              <Button onClick={handleLogin}>Login</Button>
+              <Button onClick={login}>
+                {isLoading ? "Loading..." : "Login"}
+              </Button>
             </Center>
           </FormContainer>
         </Container>
