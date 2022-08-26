@@ -77,8 +77,12 @@ const Register: NextPage = () => {
         setIsLoading(true);
         //if the password matches
         const data = { firstname, lastname, email, phone, password };
-
-        if (email !== /^[a-zA-Z0-9]+@+[a-zA-Z0-9]+.+[A-z]/) {
+        const emailValidation = (email: any) => {
+          const regex =
+            /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+          return !(email || regex.test(email) === false);
+        };
+        if (email.length < 5) {
           e.target[4].classList.add("invalid");
           setIsLoading(false);
           toast.error("Invalid email", {
@@ -129,8 +133,22 @@ const Register: NextPage = () => {
           body: JSON.stringify(data),
         });
         const json = await res.json();
-        if (!res.ok) {
-          toast.error("Something went wrong", {
+        console.log(json);
+        if (json.status === "success") {
+          setIsLoading(false);
+          toast.success(json.status, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else if (json.status === "error") {
+          setIsLoading(false);
+
+          toast.error(json.message, {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -140,27 +158,17 @@ const Register: NextPage = () => {
             progress: undefined,
           });
         } else {
-          if (json.status == "error") {
-            toast.error(json.message, {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          } else {
-            toast.success(json.status, {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          }
+          setIsLoading(false);
+
+          toast.error("Something went wrong", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
         }
       }
     }
@@ -245,7 +253,7 @@ const Register: NextPage = () => {
                 <FormGroup>
                   <Label>Email</Label>
                   <Input
-                    type="text"
+                    type="email"
                     placeholder="Enter your email address"
                     value={email}
                     onChange={(e: any) => setEmail(e.target.value)}
@@ -258,14 +266,14 @@ const Register: NextPage = () => {
                   <Input
                     placeholder="********"
                     value={password}
-                    type="text"
+                    type="password"
                     onChange={(e: any) => setPassword(e.target.value)}
                   />
                 </FormGroup>
                 <FormGroup>
                   <Label>Confirm Password</Label>
                   <Input
-                    type="text"
+                    type="password"
                     placeholder="********"
                     value={confirmPass}
                     onChange={(e: any) => setConfirmPass(e.target.value)}
