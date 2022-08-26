@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { toast } from "react-toastify";
 const AuthContext = createContext();
-import { API_URL } from "../const";
+import { API_URI, API_URL } from "../const";
+
 function AuthProvider({ children }) {
+  const router = useRouter();
   const [user, setUser] = useState({
     error: "you are logged out, and there is no user object, and no token",
   });
@@ -14,41 +17,54 @@ function AuthProvider({ children }) {
     const token = localStorage.getItem("token");
     console.log("token: ", token);
     if (!(token === null || token === undefined)) {
-      loginWithToken();
+      login(token);
     }
     setIsLoading(false);
   }, []);
 
   function login(data) {
     setIsLoading(true);
-    const { email, password } = data;
-    const config = {
+
+    fetch(`${API_URI}/authenticate `, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
-    };
-    axios
-      .request({
-        method: "post",
-        url: `${API_URL}/authenticate`,
-        data: {
-          email,
-          password,
-        },
-        config,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          const { token } = res.data;
-          localStorage.setItem("token", token);
-          setUser(res.data);
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("data: ", data);
+        if (data) {
+          setUser(data.data);
+          console.log(data.data.firstname);
           setIsAuthenticated(true);
-          setIsLoading(false);
+          localStorage.setItem("token", data.data.token);
+          toast.success("Welcome to you dashboard", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          router.push("/main");
         } else {
+          toast.error(data.message + "  Don't forget to add +", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          // setUser(data);
           setIsAuthenticated(false);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       })
       .catch((err) => {
         console.log("err: ", err);
@@ -58,10 +74,17 @@ function AuthProvider({ children }) {
 
   function logout() {
     setIsAuthenticated(false);
-    setUser({
-      error: "you are logged out, and there is no user object, and no token",
-    });
+    setUser("");
     localStorage.removeItem("token");
+    toast.info("Logout successfull", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   }
 
   return (

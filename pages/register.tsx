@@ -10,6 +10,7 @@ import { ContainerRegister } from "../styles/container";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { Div } from "../styles/div";
+import { toast } from "react-toastify";
 import { FormContainer } from "../styles/formContainer";
 import { FormGroup } from "../styles/formGroup";
 import { FormColumn } from "../styles/formRow";
@@ -21,6 +22,7 @@ import { Label } from "../styles/label";
 import { Text } from "../styles/text";
 import { Wrapper } from "../styles/wrapper";
 import { Notification } from "../styles/notification";
+import { API_URI } from "../const";
 
 const Register: NextPage = () => {
   const [firstname, setFirstName] = React.useState();
@@ -31,6 +33,7 @@ const Register: NextPage = () => {
   const [confirmPass, setConfirmPass] = React.useState();
   const [isNotification, setIsNotification] = React.useState(false);
   const [NotificationMessage, setNotificationMessage] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
   let error = false;
   const register = async (e: any) => {
     e.preventDefault();
@@ -51,7 +54,7 @@ const Register: NextPage = () => {
       }
       error = false;
     }
-    if (!error)
+    if (!error) {
       if (password != confirmPass) {
         //if the password does not match append a span to the password field and focus on it
         e.target[6].focus();
@@ -59,10 +62,108 @@ const Register: NextPage = () => {
         e.target[5].classList.add("invalid");
         e.target[6].classList.add("invalid");
 
-        alert("Password does not match");
+        toast.error("Passwords does not match", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
 
         return;
+      } else {
+        setIsLoading(true);
+        //if the password matches
+        const data = { firstname, lastname, email, phone, password };
+
+        if (email !== /^[a-zA-Z0-9]+@+[a-zA-Z0-9]+.+[A-z]/) {
+          e.target[4].classList.add("invalid");
+          setIsLoading(false);
+          toast.error("Invalid email", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          return;
+        }
+        if (phone.length < 10) {
+          e.target[3].classList.add("invalid");
+          setIsLoading(false);
+          toast.error("Phone number must be greater than 9", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          return;
+        }
+        if (password.length < 5) {
+          e.target[5].classList.add("invalid");
+          setIsLoading(false);
+          toast.error("Password must be greater than 5", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          return;
+        }
+
+        const res = await fetch(`${API_URI}/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          toast.error("Something went wrong", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          if (json.status == "error") {
+            toast.error(json.message, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          } else {
+            toast.success(json.status, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }
+        }
       }
+    }
   };
   // iterate all on typing remove invalid class
   React.useEffect(() => {
@@ -157,14 +258,14 @@ const Register: NextPage = () => {
                   <Input
                     placeholder="********"
                     value={password}
-                    type="password"
+                    type="text"
                     onChange={(e: any) => setPassword(e.target.value)}
                   />
                 </FormGroup>
                 <FormGroup>
                   <Label>Confirm Password</Label>
                   <Input
-                    type="password"
+                    type="text"
                     placeholder="********"
                     value={confirmPass}
                     onChange={(e: any) => setConfirmPass(e.target.value)}
@@ -181,7 +282,7 @@ const Register: NextPage = () => {
                 </Empty>
                 <FormGroup>
                   <Button type="submit" name="button">
-                    Register
+                    {isLoading ? "Loading..." : "Register"}
                   </Button>
                 </FormGroup>
                 <Empty className="textMobile">

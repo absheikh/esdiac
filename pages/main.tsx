@@ -49,14 +49,12 @@ const Main: NextPage = () => {
           <Heading mb="50px">Main Page</Heading>
           <Text size="28px" lineHeight="36px">
             {" "}
-            Hello my first name is {user.firsname} my last name {user.lastname}{" "}
-            is my email is {user.email}
+            Hello my first name is {user.firstname} my last name is{" "}
+            {user.lastname} my email is {user.email}
           </Text>
 
           <Text>
-            <Link href="#" onClick={logout}>
-              Logout
-            </Link>
+            <Logout onClick={logout}>logout</Logout>
           </Text>
         </MainContainer>
       </Wrapper>
@@ -73,4 +71,16 @@ const DivImage = styled.div`
 const Empty = styled.div`
   width: 100%;
 `;
+const Logout = styled.p`
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 20px 0px;
+  text-align: right;
+  color: blue;
+  &:hover {
+    color: red;
+  }
+`;
+
 export default Main;

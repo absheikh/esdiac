@@ -1,7 +1,8 @@
 import type { AppProps } from "next/app";
 import React, { createContext, useContext, useState } from "react";
 import { ThemeProvider } from "styled-components";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import GlobalStyle from "../styles/globals";
 import axios from "axios";
 import { AuthProvider } from "../shared/authContext";
@@ -22,6 +23,17 @@ const theme = {
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <AuthProvider>
         <GlobalStyle />
         <ThemeProvider theme={theme}>
