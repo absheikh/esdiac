@@ -21,27 +21,22 @@ import { Label } from "../styles/label";
 import { Text } from "../styles/text";
 import { Wrapper } from "../styles/wrapper";
 import { MainContainer } from "../styles/mainContainer";
-
+import { useRouter } from "next/router";
 import Router from "next/router";
-const useUser = () => {
-  const [user, setUser] = React.useState(null);
-  React.useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setUser(JSON.parse(user));
-    }
-  }, []);
-  return user;
-};
-
+import { useAuth } from "../shared/authContext";
+import FullPageLoader from "../components/FullPageLoader";
 const Main: NextPage = () => {
-  const user = useUser();
+  const { isAuthenticated, user, logout, isLoading } = useAuth();
+  const router = useRouter();
   useEffect(() => {
-    if (!user) {
-      Router.push("/");
+    if (!isLoading && !isAuthenticated) {
+      router.push("/");
     }
-  });
+  }, [isAuthenticated, isLoading]);
 
+  if (isLoading || !isAuthenticated) {
+    return <FullPageLoader />;
+  }
   return (
     <>
       <Head>

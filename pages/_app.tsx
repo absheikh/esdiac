@@ -4,7 +4,7 @@ import { ThemeProvider } from "styled-components";
 
 import GlobalStyle from "../styles/globals";
 import axios from "axios";
-
+import { AuthProvider } from "../shared/authContext";
 const theme = {
   colors: {
     primary: "#4461F2",
@@ -22,10 +22,12 @@ const theme = {
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
-      <GlobalStyle />
-      <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <AuthProvider>
+        <GlobalStyle />
+        <ThemeProvider theme={theme}>
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </AuthProvider>
     </>
   );
 }
